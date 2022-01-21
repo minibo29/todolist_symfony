@@ -3,7 +3,9 @@
 namespace App\Controller\API;
 
 use App\Entity\Task;
-use App\Form\TaskType;
+use App\Entity\Task\TaskPriority;
+use App\Entity\Task\TaskStatus;
+use App\Entity\Task\TaskType;
 use App\Repository\TaskRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -32,23 +34,79 @@ class TaskController extends AbstractController
     /**
      * @Route("/", name="api.task_new", methods={"POST"})
      *
+     * @OA\Parameter(
+     *     name="title",
+     *     in="query",
+     *     description="Title of task.",
+     *     required=true,
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Parameter(
+     *     name="description",
+     *     in="query",
+     *     description="Description of task.",
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Parameter(
+     *     name="priority",
+     *     in="query",
+     *     description="Task prioriti",
+     *     required=true,
+     *     @OA\Schema(
+     *          type="string",
+     *          enum={1, 2, 3},
+     *          default=2
+     *     )
+     * )
+     * @OA\Parameter(
+     *     name="status",
+     *     in="query",
+     *     description="The field used to order rewards",
+     *     required=true,
+     *     @OA\Schema(
+     *          type="integer",
+     *          enum={1, 2, 3},
+     *          default=1
+     *     )
+     * )
+     * @OA\Parameter(
+     *     name="type",
+     *     in="query",
+     *     description="Id ",
+     *     required=true,
+     *     @OA\Schema(
+     *          type="integer",
+     *          enum={1, 2, 3},
+     *          default=1
+     *     )
+     * )
+     * @OA\Parameter(
+     *     name="schedule-time",
+     *     in="query",
+     *     description="Schedule date",
+     *     required=true,
+     *     @OA\Schema(type="string")
+     * )
      */
     public function addAction(Request $request, EntityManagerInterface $entityManager,ValidatorInterface $validator): Response
     {
         try {
             $request = $this->transformJsonBody($request);
 
-            if (!$request || !$request->get('name') || !$request->request->get('description')) {
+            if (!$request) {
                 throw new \Exception();
             }
+            $priority = $entityManager->getRepository(TaskPriority::class)->find($request->get('priority'));
+            $status = $entityManager->getRepository(TaskStatus::class)->find($request->get('priority'));
+            $type = $entityManager->getRepository(TaskType::class)->find($request->get('priority'));
 
             $task = new Task();
             $task->setTitle($request->get('title'));
             $task->setDesc($request->get('description'));
-            $task->setPriority($request->get('priority'));
-            $task->setStatus($request->get('status'));
-            $task->setType($request->get('type'));
-            $task->setScheduleTime($request->get('schedule-time'));
+            $task->setPriority($priority);
+            $task->setStatus($status);
+            $task->setType($type);
+            $task->setScheduleTime(new \DateTimeImmutable($request->get('schedule-time')));
 
             $errors = $validator->validate($task);
             if (count($errors) > 0) {
@@ -60,7 +118,6 @@ class TaskController extends AbstractController
 
                 return $this->response($data);
             }
-
             $entityManager->persist($task);
             $entityManager->flush();
 
@@ -68,11 +125,18 @@ class TaskController extends AbstractController
                 'status' => 200,
                 'success' => "Post added successfully",
             ];
+
             return $this->response($data);
         } catch (\Exception $e) {
+
+            print_r('<pre>');
+            print_r($e->getMessage());
+            print_r('</pre>');
+            exit;
+            
             $data = [
                 'status' => 422,
-                'errors' => "Data no valid",
+                'errors' => $e->getMessage(),
             ];
             return $this->response($data, 422);
         }
@@ -91,11 +155,9 @@ class TaskController extends AbstractController
      *     )
      * )
      */
-    public function showAction(Task $task): Response
+    public function showAction(Task $task): JsonResponse
     {
-        return $this->render('task/show.html.twig', [
-            'task' => $task,
-        ]);
+        return $this->response($task);
     }
 
     /**

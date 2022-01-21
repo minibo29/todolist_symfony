@@ -2,15 +2,18 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Entity\Task\TaskPriority;
 use App\Entity\Task\TaskStatus;
 use App\Entity\Task\TaskType;
 use App\Repository\TaskRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=TaskRepository::class)
+ * @ORM\HasLifecycleCallbacks
  */
 class Task
 {
@@ -19,6 +22,7 @@ class Task
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @SerializedName("id")
      */
     private $id;
 
@@ -41,6 +45,7 @@ class Task
 
     /**
      * @ORM\OneToOne(targetEntity=TaskPriority::class, cascade={"persist", "remove"})
+     * @ORM\JoinColumn
      * @Assert\NotBlank
      */
     private $priority;
@@ -52,7 +57,7 @@ class Task
     private $type;
 
     /**
-     * @ORM\ManyToOne(targetEntity=TaskStatus::class)
+     * @ORM\OneToOne(targetEntity=TaskStatus::class)
      * @Assert\NotBlank
      */
     private $status;
@@ -146,17 +151,17 @@ class Task
     /**
      * @return mixed
      */
-    public function getScheduleTime(): ?\DateTimeImmutable
+    public function getScheduleTime(): ?\DateTime
     {
         return $this->scheduleTime;
     }
 
     /**
-     * @param \DateTimeImmutable $scheduleTime
+     * @param \DateTime $scheduleTime
      *
      * @return Task
      */
-    public function setScheduleTime(\DateTimeImmutable  $scheduleTime): self
+    public function setScheduleTime(\DateTime  $scheduleTime): self
     {
         $this->scheduleTime = $scheduleTime;
         return $this;
@@ -169,9 +174,9 @@ class Task
      */
     public function updatedTimestamps(): void
     {
-        $this->setUpdatedAt(new \DateTime('now'));
+        $this->setUpdatedAt(new \DateTimeImmutable('now'));
         if ($this->getCreatedAt() === null) {
-            $this->setCreatedAt(new \DateTime('now'));
+            $this->setCreatedAt(new \DateTimeImmutable('now'));
         }
     }
 
@@ -197,6 +202,18 @@ class Task
         $this->updatedAt = $updatedAt;
 
         return $this;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'title' => $this->title,
+            'description' => $this->desc,
+            'priority' => $this->priority->getName(),
+            'status' => $this->status->getName(),
+            'type' => $this->type->getName(),
+            'schedule-time' => $this->scheduleTime->format('Y-m-d'),
+        ];
     }
 
 }
