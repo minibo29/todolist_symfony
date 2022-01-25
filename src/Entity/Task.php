@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
 use App\Entity\Task\TaskPriority;
 use App\Entity\Task\TaskStatus;
 use App\Entity\Task\TaskType;
@@ -10,12 +9,13 @@ use App\Repository\TaskRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
+use JsonSerializable;
 
 /**
  * @ORM\Entity(repositoryClass=TaskRepository::class)
  * @ORM\HasLifecycleCallbacks
  */
-class Task
+class Task implements JsonSerializable
 {
 
     /**
@@ -44,20 +44,20 @@ class Task
     private $scheduleTime;
 
     /**
-     * @ORM\OneToOne(targetEntity=TaskPriority::class, cascade={"persist", "remove"})
+     * @ORM\ManyToOne(targetEntity=TaskPriority::class)
      * @ORM\JoinColumn
      * @Assert\NotBlank
      */
     private $priority;
 
     /**
-     * @ORM\OneToOne(targetEntity=TaskType::class, cascade={"persist", "remove"})
+     * @ORM\ManyToOne(targetEntity=TaskType::class)
      * @Assert\NotBlank
      */
     private $type;
 
     /**
-     * @ORM\OneToOne(targetEntity=TaskStatus::class)
+     * @ORM\ManyToOne(targetEntity=TaskStatus::class)
      * @Assert\NotBlank
      */
     private $status;
@@ -204,16 +204,16 @@ class Task
         return $this;
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
+            'id' => $this->id,
             'title' => $this->title,
             'description' => $this->desc,
-            'priority' => $this->priority->getName(),
-            'status' => $this->status->getName(),
-            'type' => $this->type->getName(),
+            'priority' => $this->priority,
+            'status' => $this->status,
+            'type' => $this->type,
             'schedule-time' => $this->scheduleTime->format('Y-m-d'),
         ];
     }
-
 }

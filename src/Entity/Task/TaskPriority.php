@@ -4,11 +4,12 @@ namespace App\Entity\Task;
 
 use App\Repository\Task\TaskPriorityRepository;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 
 /**
  * @ORM\Entity(repositoryClass=TaskPriorityRepository::class)
  */
-class TaskPriority
+class TaskPriority implements JsonSerializable
 {
     /**
      * @ORM\Id
@@ -90,4 +91,12 @@ class TaskPriority
             ) = unserialize($serialized, array('allowed_classes' => false));
     }
 
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'label' => $this->label,
+        ];
+    }
 }

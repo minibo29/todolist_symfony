@@ -7,6 +7,7 @@ use App\Entity\Task\TaskPriority;
 use App\Entity\Task\TaskStatus;
 use App\Entity\Task\TaskType;
 use App\Repository\TaskRepository;
+use App\Service\TaskService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,12 +19,18 @@ use OpenApi\Annotations as OA;
 use Nelmio\ApiDocBundle\Annotation\Model;
 
 /**
- * @Route("/api/task")
+ * @Route("/api/task", name="api.task.")
  */
 class TaskController extends AbstractController
 {
+    public function __construct(
+        private TaskService $taskService
+    )
+    {
+    }
+
     /**
-     * @Route("/", name="api.task_index", methods={"GET"})
+     * @Route("/", name="index", methods={"GET"})
      *
      */
     public function listAction(TaskRepository $taskRepository): Response
@@ -32,7 +39,7 @@ class TaskController extends AbstractController
     }
 
     /**
-     * @Route("/", name="api.task_new", methods={"POST"})
+     * @Route("/", name=".new", methods={"POST"})
      *
      * @OA\Parameter(
      *     name="title",
@@ -96,9 +103,10 @@ class TaskController extends AbstractController
             if (!$request) {
                 throw new \Exception();
             }
+
             $priority = $entityManager->getRepository(TaskPriority::class)->find($request->get('priority'));
-            $status = $entityManager->getRepository(TaskStatus::class)->find($request->get('priority'));
-            $type = $entityManager->getRepository(TaskType::class)->find($request->get('priority'));
+            $status = $entityManager->getRepository(TaskStatus::class)->find($request->get('status'));
+            $type = $entityManager->getRepository(TaskType::class)->find($request->get('type'));
 
             $task = new Task();
             $task->setTitle($request->get('title'));
@@ -106,7 +114,7 @@ class TaskController extends AbstractController
             $task->setPriority($priority);
             $task->setStatus($status);
             $task->setType($type);
-            $task->setScheduleTime(new \DateTimeImmutable($request->get('schedule-time')));
+            $task->setScheduleTime(new \DateTime($request->get('schedule-time')));
 
             $errors = $validator->validate($task);
             if (count($errors) > 0) {
@@ -118,22 +126,19 @@ class TaskController extends AbstractController
 
                 return $this->response($data);
             }
-            $entityManager->persist($task);
-            $entityManager->flush();
+
+            $task = $this->taskService->createTask($task);
+
 
             $data = [
                 'status' => 200,
                 'success' => "Post added successfully",
+                'task' => $task
             ];
 
             return $this->response($data);
         } catch (\Exception $e) {
 
-            print_r('<pre>');
-            print_r($e->getMessage());
-            print_r('</pre>');
-            exit;
-            
             $data = [
                 'status' => 422,
                 'errors' => $e->getMessage(),
@@ -144,7 +149,7 @@ class TaskController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="api.task_show", methods={"GET"}, requirements={"id":"\d+"})
+     * @Route("/{id}", name=".show", methods={"GET"}, requirements={"id":"\d+"})
      *
      * @OA\Response(
      *     response=200,
@@ -161,36 +166,110 @@ class TaskController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="api.task_edit", methods={"PUT"}, requirements={"id":"\d+"})
+     * @Route("/{id}", name=".edit", methods={"PUT"}, requirements={"id":"\d+"})
+     *
+     *@OA\Parameter(
+     *     name="title",
+     *     in="query",
+     *     description="Title of task.",
+     *     required=true,
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Parameter(
+     *     name="description",
+     *     in="query",
+     *     description="Description of task.",
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Parameter(
+     *     name="priority",
+     *     in="query",
+     *     description="Task prioriti",
+     *     required=true,
+     *     @OA\Schema(
+     *          type="string",
+     *          enum={1, 2, 3},
+     *          default=2
+     *     )
+     * )
+     * @OA\Parameter(
+     *     name="status",
+     *     in="query",
+     *     description="The field used to order rewards",
+     *     required=true,
+     *     @OA\Schema(
+     *          type="integer",
+     *          enum={1, 2, 3},
+     *          default=1
+     *     )
+     * )
+     * @OA\Parameter(
+     *     name="type",
+     *     in="query",
+     *     description="Id ",
+     *     required=true,
+     *     @OA\Schema(
+     *          type="integer",
+     *          enum={1, 2, 3},
+     *          default=1
+     *     )
+     * )
+     * @OA\Parameter(
+     *     name="schedule-time",
+     *     in="query",
+     *     description="Schedule date",
+     *     required=true,
+     *     @OA\Schema(type="string")
+     * )
      */
     public function editAction(Request $request, Task $task, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(TaskType::class, $task);
-        $form->handleRequest($request);
+        try {
+            $priority = $entityManager->getRepository(TaskPriority::class)->find($request->get('priority'));
+            $status = $entityManager->getRepository(TaskStatus::class)->find($request->get('status'));
+            $type = $entityManager->getRepository(TaskType::class)->find($request->get('type'));
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+            $task->setTitle($request->get('title'));
+            $task->setDesc($request->get('description'));
+            $task->setPriority($priority);
+            $task->setStatus($status);
+            $task->setType($type);
+            $task->setScheduleTime(new \DateTime($request->get('schedule-time')));
 
-            return $this->redirectToRoute('task_index', [], Response::HTTP_SEE_OTHER);
+            $task = $this->taskService->updateTask($task);
+
+            $data = [
+                'status' => 200,
+                'success' => "Post updated successfully",
+                'task' => $task
+            ];
+
+            return $this->response($data);
+        } catch (\Exception $e) {
+
+            $data = [
+            'status' => 422,
+            'errors' => $e->getMessage(),
+            ];
+            return $this->response($data, 422);
         }
-
-        return $this->renderForm('task/edit.html.twig', [
-            'task' => $task,
-            'form' => $form,
-        ]);
     }
 
     /**
-     * @Route("/{id}", name="api.task_delete", methods={"DELETE"})
+     * @Route("/{id}", name=".delete", methods={"DELETE"})
      */
-    public function deleteAction(Request $request, Task $task, EntityManagerInterface $entityManager): Response
+    public function deleteAction(Task $task): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$task->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($task);
-            $entityManager->flush();
+        if (!$task) {
+            $data = [
+                'status' => 422,
+                'errors' => 'Task not found.',
+            ];
+            return $this->response($data, 422);
         }
 
-        return $this->redirectToRoute('api.task_index', [], Response::HTTP_SEE_OTHER);
+        $this->taskService->deleteTask($task);
+        return $this->response('Task deleted successfully.');
     }
 
     /**
@@ -206,7 +285,7 @@ class TaskController extends AbstractController
         return new JsonResponse($data, $status, $headers);
     }
 
-    protected function transformJsonBody(\Symfony\Component\HttpFoundation\Request $request): Request
+    protected function transformJsonBody(Request $request): Request
     {
         $data = json_decode($request->getContent(), true);
 

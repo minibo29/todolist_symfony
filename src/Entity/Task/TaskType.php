@@ -4,11 +4,12 @@ namespace App\Entity\Task;
 
 use App\Repository\Task\TaskTypeRepository;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 
 /**
  * @ORM\Entity(repositoryClass=TaskTypeRepository::class)
  */
-class TaskType
+class TaskType implements JsonSerializable
 {
     /**
      * @ORM\Id
@@ -68,5 +69,14 @@ class TaskType
     {
         $this->label = $label;
         return $this;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'label' => $this->label,
+        ];
     }
 }
