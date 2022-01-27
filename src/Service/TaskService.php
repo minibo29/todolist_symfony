@@ -33,7 +33,6 @@ class TaskService
             $this->entityManager->flush();
 
             $this->eventDispatcher->dispatch(new TaskCreatedEvent($task));
-
             return $task;
         } catch (\Exception $exception) {
             throw new \Exception($exception);
@@ -50,7 +49,6 @@ class TaskService
             $this->entityManager->flush();
 
             $this->eventDispatcher->dispatch(new TaskUpdatedEvent($task));
-
             return $task;
         } catch (\Exception $exception) {
             throw new \Exception($exception);

@@ -151,17 +151,17 @@ class Task implements JsonSerializable
     /**
      * @return mixed
      */
-    public function getScheduleTime(): ?\DateTime
+    public function getScheduleTime(): ?\DateTimeImmutable
     {
         return $this->scheduleTime;
     }
 
     /**
-     * @param \DateTime $scheduleTime
+     * @param \DateTimeImmutable $scheduleTime
      *
      * @return Task
      */
-    public function setScheduleTime(\DateTime  $scheduleTime): self
+    public function setScheduleTime(\DateTimeImmutable  $scheduleTime): self
     {
         $this->scheduleTime = $scheduleTime;
         return $this;
