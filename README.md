@@ -6,7 +6,7 @@ Pet project
 
 You have Linux + docker + docker-compose installed.
 
-Make sure your used belonges to `docker` group by running `groups` in `bash`
+Make sure your user belongs to `docker` group by running `groups` in `bash`
 
 If `docker` group is not listed, then run:
 
@@ -69,3 +69,8 @@ Create tables `bin/console.sh doctrine:migrations:migrate`
 
 Load data in DB `bin/console.sh doctrine:fixtures:load`
 
+
+### Using the project
+
+Now you can use the project by url `http:\\localhost`
+API documentation you can find `http:\\localhost\api\doc` page.
