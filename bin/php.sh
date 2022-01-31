@@ -5,4 +5,4 @@
 
 cd $LARADOCK_PATH
 
-docker exec -u=$(id -u) $(echo $COMPOSE_PROJECT_NAME)_workspace_1  php ./vendor/bin/phpstan "$@"
+docker exec -u=$(id -u) $(echo  $COMPOSE_PROJECT_NAME)_workspace_1 php "$@"
