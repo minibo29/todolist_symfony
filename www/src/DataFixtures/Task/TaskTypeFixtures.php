@@ -8,7 +8,9 @@ use Doctrine\Persistence\ObjectManager;
 
 class TaskTypeFixtures extends Fixture
 {
-
+    /**
+     * @var array<mixed>
+     */
     private array $data = [
         [
             'id' => 1,
@@ -27,7 +29,7 @@ class TaskTypeFixtures extends Fixture
         ],
     ];
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         foreach ($this->data as $data){
             $taskType = new TaskType();

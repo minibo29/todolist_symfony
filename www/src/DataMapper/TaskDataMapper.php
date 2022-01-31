@@ -7,6 +7,8 @@ use App\Entity\Task\TaskPriority;
 use App\Entity\Task\TaskStatus;
 use App\Entity\Task\TaskType;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
+use Symfony\Component\HttpFoundation\Request;
 
 class TaskDataMapper
 {
@@ -14,15 +16,17 @@ class TaskDataMapper
     public function __construct(
         private EntityManagerInterface $entityManager,
     )
-    {}
+    {
+    }
 
     /**
-     * @param $request
+     * @param Request $request
+     * @param Task|null $task
      *
      * @return Task
-     * @throws \Exception
+     * @throws Exception
      */
-    public function mapRequestContentToEntity($request, ?Task $task = null): Task
+    public function mapRequestContentToEntity(Request $request, ?Task $task = null): Task
     {
         if (null == $task) {
             $task = new Task();
@@ -37,14 +41,13 @@ class TaskDataMapper
         }
 
         if ($scheduleTime = $request->get('scheduleTime')) {
-
-            $task->setScheduleTime(new \DateTimeImmutable($scheduleTime));
+            $task->setScheduleTime(new \DateTime($scheduleTime));
         }
 
         if ($priority = $request->get('priority')) {
             $priority = $this->entityManager->getRepository(TaskPriority::class)->find($priority['id']);
 
-            if($priority){
+            if ($priority) {
                 $task->setPriority($priority);
             }
         }
@@ -52,7 +55,7 @@ class TaskDataMapper
         if ($type = $request->get('type')) {
             $type = $this->entityManager->getRepository(TaskType::class)->find($type['id']);
 
-            if($priority){
+            if ($type) {
                 $task->setType($type);
             }
         }
@@ -60,7 +63,7 @@ class TaskDataMapper
         if ($status = $request->get('status')) {
             $status = $this->entityManager->getRepository(TaskStatus::class)->find($status['id']);
 
-            if($status){
+            if ($status) {
                 $task->setStatus($status);
             }
         }

@@ -15,17 +15,17 @@ class TaskType implements JsonSerializable
      * @ORM\Id
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private int $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $name;
+    private String $name;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $label;
+    private String $label;
 
     public function getId(): ?int
     {
@@ -33,9 +33,11 @@ class TaskType implements JsonSerializable
     }
 
     /**
-     * @param mixed $id
+     * @param int $id
+     *
+     * @return TaskType
      */
-    public function setId($id): self
+    public function setId(int $id): self
     {
         $this->id = $id;
 
@@ -55,7 +57,7 @@ class TaskType implements JsonSerializable
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getLabel(): ?string
     {
@@ -63,15 +65,20 @@ class TaskType implements JsonSerializable
     }
 
     /**
-     * @param self $label
+     * @param String $label
+     * @return TaskType
      */
-    public function setLabel($label): self
+    public function setLabel(String $label): self
     {
         $this->label = $label;
+
         return $this;
     }
 
-    public function jsonSerialize()
+    /**
+     * @return array<mixed>
+     */
+    public function jsonSerialize(): array
     {
         return [
             'id' => $this->id,

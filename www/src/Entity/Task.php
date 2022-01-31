@@ -7,6 +7,7 @@ use App\Entity\Task\TaskStatus;
 use App\Entity\Task\TaskType;
 use App\Repository\TaskRepository;
 use Doctrine\ORM\Mapping as ORM;
+use JetBrains\PhpStorm\ArrayShape;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
 use JsonSerializable;
@@ -24,53 +25,53 @@ class Task implements JsonSerializable
      * @ORM\Column(type="integer")
      * @SerializedName("id")
      */
-    private $id;
+    private ?int $id;
 
     /**
      * @ORM\Column(name="strTaskName", type="string", length=50)
      * @Assert\NotBlank
      */
-    private $title;
+    private ?String $title;
 
     /**
      * @ORM\Column(name="strTaskDesc", type="text", length=255)
      * @Assert\NotBlank
      */
-    private $desc;
+    private ?String $desc;
 
     /**
      * @ORM\Column(name="dtmScheduleTime", type="date", nullable=true)
      */
-    private $scheduleTime;
+    private ?\DateTime $scheduleTime;
 
     /**
      * @ORM\ManyToOne(targetEntity=TaskPriority::class)
      * @ORM\JoinColumn
      * @Assert\NotBlank
      */
-    private $priority;
+    private ?TaskPriority $priority;
 
     /**
      * @ORM\ManyToOne(targetEntity=TaskType::class)
      * @Assert\NotBlank
      */
-    private $type;
+    private ?TaskType $type;
 
     /**
      * @ORM\ManyToOne(targetEntity=TaskStatus::class)
      * @Assert\NotBlank
      */
-    private $status;
+    private ?TaskStatus $status;
 
     /**
      * @ORM\Column(type="datetime_immutable")
      */
-    private $createdAt;
+    private ?\DateTimeImmutable $createdAt;
 
     /**
      * @ORM\Column(type="datetime_immutable")
      */
-    private $updatedAt;
+    private ?\DateTimeImmutable $updatedAt;
 
     public function getId(): ?int
     {
@@ -114,17 +115,17 @@ class Task implements JsonSerializable
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getTitle()
+    public function getTitle(): ?string
     {
         return $this->title;
     }
 
     /**
-     * @param mixed $title
+     * @param string $title
      */
-    public function setTitle($title): self
+    public function setTitle(string $title): self
     {
         $this->title = $title;
 
@@ -132,36 +133,37 @@ class Task implements JsonSerializable
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getDesc()
+    public function getDesc(): ?string
     {
         return $this->desc;
     }
 
     /**
-     * @param mixed $desc
+     * @param string $desc
+     * @return Task
      */
-    public function setDesc($desc): self
+    public function setDesc(string $desc): self
     {
         $this->desc = $desc;
         return $this;
     }
 
     /**
-     * @return mixed
+     * @return \DateTime|null
      */
-    public function getScheduleTime(): ?\DateTimeImmutable
+    public function getScheduleTime(): ?\DateTime
     {
         return $this->scheduleTime;
     }
 
     /**
-     * @param \DateTimeImmutable $scheduleTime
+     * @param \DateTime $scheduleTime
      *
      * @return Task
      */
-    public function setScheduleTime(\DateTimeImmutable  $scheduleTime): self
+    public function setScheduleTime(\DateTime  $scheduleTime): self
     {
         $this->scheduleTime = $scheduleTime;
         return $this;
@@ -204,6 +206,9 @@ class Task implements JsonSerializable
         return $this;
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function jsonSerialize(): array
     {
         return [

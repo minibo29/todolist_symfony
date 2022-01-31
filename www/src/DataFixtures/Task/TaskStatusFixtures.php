@@ -8,7 +8,9 @@ use Doctrine\Persistence\ObjectManager;
 
 class TaskStatusFixtures extends Fixture
 {
-
+    /**
+     * @var array<mixed>
+     */
     private array $data = [
         [
             'id' => 1,
@@ -27,7 +29,7 @@ class TaskStatusFixtures extends Fixture
         ],
     ];
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         foreach ($this->data as $data){
             $taskStatus = new TaskStatus();

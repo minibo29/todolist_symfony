@@ -3,11 +3,8 @@
 namespace App\Test\DataMapper;
 
 use App\DataMapper\TaskDataMapper;
-use App\Entity\Task;
-use App\Service\TaskService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class TaskDataMapperTest extends KernelTestCase
@@ -17,30 +14,42 @@ class TaskDataMapperTest extends KernelTestCase
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->taskDataMapper = new TaskDataMapper();
+        $this->taskDataMapper = new TaskDataMapper($this->entityManager);
     }
 
     /** @test */
-    public function it_has_to_convert_to_task_entity()
+    public function it_has_to_convert_request_to_task_entity()
     {
+        $request = new Request();
         // Set Up
         $taskContent = [
             'id' => '2',
             'title' => 'title',
-            'desc' => '',
-            'scheduleTime' => '',
-            'priority' =>[],
-            'type' =>[],
-            'status' =>[],
+            'desc' => 'title',
+            'scheduleTime' => '2022-01-27T15:35:25.505Z',
+            'priority' => [
+                "id" => 1,
+                "name" => "string",
+                "label" => "string",
+            ],
+            'type' => [
+                "id" => 1,
+                "name" => "string",
+                "label" => "string",
+            ],
+            'status' => [
+                "id" => 1,
+                "name" => "string",
+                "label" => "string",
+            ],
         ];
+        $request->request->replace($taskContent);
 
         // Do something
-        $taskEntity = $this->taskDataMapper->mapRequestContentToEntity($taskContent);
+        $taskEntity = $this->taskDataMapper->mapRequestContentToEntity($request);
 
         // Make assertions
-        $this->assertEquals($taskContent, $taskEntity->jsonSerialize());
+        $this->assertEquals(json_encode($taskContent), $taskEntity->jsonSerialize());
     }
-
-
 
 }

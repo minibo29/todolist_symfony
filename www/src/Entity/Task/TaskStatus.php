@@ -15,17 +15,17 @@ class TaskStatus implements JsonSerializable
      * @ORM\Id
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private ?int $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $name;
+    private ?string $name;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $label;
+    private ?string $label;
 
     public function getId(): ?int
     {
@@ -33,9 +33,11 @@ class TaskStatus implements JsonSerializable
     }
 
     /**
-     * @param self $id
+     * @param int $id
+     *
+     * @return TaskStatus
      */
-    public function setId($id): self
+    public function setId(int $id): self
     {
         $this->id = $id;
 
@@ -55,7 +57,7 @@ class TaskStatus implements JsonSerializable
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getLabel(): ?string
     {
@@ -63,15 +65,20 @@ class TaskStatus implements JsonSerializable
     }
 
     /**
-     * @param self $label
+     * @param string $label
+     *
+     * @return TaskStatus
      */
-    public function setLabel($label): self
+    public function setLabel(string $label): self
     {
         $this->label = $label;
         return $this;
     }
 
-    public function jsonSerialize()
+    /**
+     * @return array<mixed>
+     */
+    public function jsonSerialize(): array
     {
         return [
             'id' => $this->id,

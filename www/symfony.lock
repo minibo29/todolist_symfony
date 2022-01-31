@@ -106,6 +106,9 @@
     "laminas/laminas-code": {
         "version": "4.5.1"
     },
+    "murtukov/php-code-generator": {
+        "version": "v0.1.6"
+    },
     "myclabs/deep-copy": {
         "version": "1.10.2"
     },
@@ -137,6 +140,20 @@
     "nikic/php-parser": {
         "version": "v4.13.2"
     },
+    "overblog/graphql-bundle": {
+        "version": "1.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "master",
+            "version": "0.12",
+            "ref": "b122f3bfcfc0706c617a74afa8510af4799810f6"
+        },
+        "files": [
+            "config/graphql/types/.gitignore",
+            "config/packages/graphql.yaml",
+            "config/routes/graphql.yaml"
+        ]
+    },
     "phar-io/manifest": {
         "version": "2.0.3"
     },
@@ -157,6 +174,12 @@
     },
     "phpstan/phpdoc-parser": {
         "version": "1.2.0"
+    },
+    "phpstan/phpstan": {
+        "version": "1.4.3"
+    },
+    "phpstan/phpstan-doctrine": {
+        "version": "1.2.8"
     },
     "phpunit/php-code-coverage": {
         "version": "9.2.10"
@@ -604,6 +627,9 @@
     },
     "webmozart/assert": {
         "version": "1.10.0"
+    },
+    "webonyx/graphql-php": {
+        "version": "dev-master"
     },
     "zircote/swagger-php": {
         "version": "4.2.4"

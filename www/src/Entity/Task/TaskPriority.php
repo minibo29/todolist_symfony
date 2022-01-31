@@ -15,17 +15,17 @@ class TaskPriority implements JsonSerializable
      * @ORM\Id
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private ?int $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $name;
+    private ?string $name;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $label;
+    private ?string $label;
 
     public function getId(): ?int
     {
@@ -33,9 +33,10 @@ class TaskPriority implements JsonSerializable
     }
 
     /**
-     * @param self $id
+     * @param int $id
+     * @return TaskPriority
      */
-    public function setId($id): self
+    public function setId(int $id): self
     {
         $this->id = $id;
 
@@ -55,7 +56,7 @@ class TaskPriority implements JsonSerializable
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getLabel(): ?string
     {
@@ -63,9 +64,10 @@ class TaskPriority implements JsonSerializable
     }
 
     /**
-     * @param self $label
+     * @param string $label
+     * @return TaskPriority
      */
-    public function setLabel($label): self
+    public function setLabel(string $label): self
     {
         $this->label = $label;
         return $this;
@@ -81,8 +83,11 @@ class TaskPriority implements JsonSerializable
         ));
     }
 
-    /** @see \Serializable::unserialize() */
-    public function unserialize($serialized)
+    /**
+     * @see \Serializable::unserialize()
+     * @param string $serialized The string representation of the object.
+     */
+    public function unserialize($serialized): void
     {
         list (
             $this->id,
@@ -91,7 +96,10 @@ class TaskPriority implements JsonSerializable
             ) = unserialize($serialized, array('allowed_classes' => false));
     }
 
-    public function jsonSerialize()
+    /**
+     * @return array<mixed>
+     */
+    public function jsonSerialize(): array
     {
         return [
             'id' => $this->id,

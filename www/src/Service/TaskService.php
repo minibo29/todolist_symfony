@@ -26,7 +26,7 @@ class TaskService
     /**
      * @throws \Exception
      */
-    public function createTask($task)
+    public function createTask(Task $task): Task
     {
         try {
             $this->entityManager->persist($task);
@@ -42,7 +42,7 @@ class TaskService
     /**
      * @throws \Exception
      */
-    public function updateTask($task)
+    public function updateTask(Task $task): Task
     {
         try {
             $this->entityManager->persist($task);
@@ -58,7 +58,7 @@ class TaskService
     /**
      * @throws \Exception
      */
-    public function deleteTask($task)
+    public function deleteTask(Task $task): Task
     {
         try {
             $this->entityManager->remove($task);

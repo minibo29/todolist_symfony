@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use OpenApi\Annotations as OA;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -35,7 +36,7 @@ class TaskController extends AbstractController
      * @Route("/", name="index", methods={"GET"})
      *
      * @OA\Response(
-     *     response=200,
+     *     response=Response::HTTP_OK,
      *     description="Returns the rewards of an tasks",
      *     @OA\Schema(
      *         type="array",
@@ -64,24 +65,15 @@ class TaskController extends AbstractController
         try {
             $request = $this->transformJsonBody($request);
             $task = $this->taskDataMapper->mapRequestContentToEntity($request);
-
             $errors = $validator->validate($task);
-            
-            if (count($errors) > 0) {
-                $data = [
-                    'code'=> 1024,
-                    'message'=> 'Validation Failed',
-                    'errors' => (string) $errors,
-                ];
 
-                return $this->response($data);
+            if (count($errors) > 0) {
+                return $this->formErrorResponse($errors);
             }
 
             $task = $this->taskService->createTask($task);
-
-
             $data = [
-                'status' => 200,
+                'status' => Response::HTTP_OK,
                 'success' => "Post added successfully",
                 'task' => $task
             ];
@@ -90,10 +82,10 @@ class TaskController extends AbstractController
         } catch (\Exception $e) {
 
             $data = [
-                'status' => 422,
+                'status' => Response::HTTP_UNPROCESSABLE_ENTITY,
                 'errors' => $e->getMessage(),
             ];
-            return $this->response($data, 422);
+            return $this->response($data, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
     }
@@ -102,7 +94,7 @@ class TaskController extends AbstractController
      * @Route("/{id}", name=".show", methods={"GET"}, requirements={"id":"\d+"})
      *
      * @OA\Response(
-     *     response=200,
+     *     response=Response::HTTP_OK,
      *     description="Returns the rewards of an user",
      *     @OA\JsonContent(
      *          ref=@Model(type=Task::class)
@@ -131,19 +123,13 @@ class TaskController extends AbstractController
             $errors = $validator->validate($task);
 
             if (count($errors) > 0) {
-                $data = [
-                    'code'=> 1024,
-                    'message'=> 'Validation Failed',
-                    'errors' => (string) $errors,
-                ];
-
-                return $this->response($data);
+                return $this->formErrorResponse($errors);
             }
 
             $task = $this->taskService->updateTask($task);
 
             $data = [
-                'status' => 200,
+                'status' => Response::HTTP_OK,
                 'success' => "Post updated successfully",
                 'task' => $task
             ];
@@ -152,10 +138,10 @@ class TaskController extends AbstractController
         } catch (\Exception $e) {
 
             $data = [
-            'status' => 422,
+            'status' => Response::HTTP_UNPROCESSABLE_ENTITY,
             'errors' => $e->getMessage(),
             ];
-            return $this->response($data, 422);
+            return $this->response($data, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
     }
 
@@ -166,7 +152,7 @@ class TaskController extends AbstractController
     {
         $task = $this->taskService->deleteTask($task);
         $data = [
-            'status' => 200,
+            'status' => Response::HTTP_OK,
             'success' => 'Task deleted successfully.',
             'task' => $task
         ];
@@ -177,12 +163,12 @@ class TaskController extends AbstractController
     /**
      * Returns a JSON response
      *
-     * @param array $data
-     * @param $status
-     * @param array $headers
+     * @param mixed $data
+     * @param int $status
+     * @param array<mixed> $headers
      * @return JsonResponse
      */
-    public function response($data, $status = 200, $headers = []): JsonResponse
+    public function response(mixed $data, int $status = Response::HTTP_OK, array $headers = []): JsonResponse
     {
         return new JsonResponse($data, $status, $headers);
     }
@@ -200,4 +186,19 @@ class TaskController extends AbstractController
         return $request;
     }
 
+    protected function formErrorResponse(ConstraintViolationListInterface $errors): Response
+    {
+        $errorMessages = [];
+
+        foreach ($errors as $violation) {
+            $errorMessages[$violation->getPropertyPath()][] = $violation->getMessage();
+        }
+        $data = [
+            'code'=> 1024,
+            'message'=> 'Validation Failed',
+            'errors' => $errorMessages,
+        ];
+
+        return $this->response($data);
+    }
 }

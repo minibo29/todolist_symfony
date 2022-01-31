@@ -9,6 +9,9 @@ use Doctrine\Persistence\ObjectManager;
 class TaskPriorityFixtures extends Fixture
 {
 
+    /**
+     * @var array<mixed>
+     */
     private array $data = [
         [
             'id' => 1,
@@ -27,7 +30,7 @@ class TaskPriorityFixtures extends Fixture
         ],
     ];
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         foreach ($this->data as $data){
             $taskPriority = new TaskPriority();
