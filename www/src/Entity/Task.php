@@ -6,6 +6,7 @@ use App\Entity\Task\TaskPriority;
 use App\Entity\Task\TaskStatus;
 use App\Entity\Task\TaskType;
 use App\Repository\TaskRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\ArrayShape;
 use Symfony\Component\Serializer\Annotation\SerializedName;
@@ -13,7 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use JsonSerializable;
 
 /**
- * @ORM\Entity(repositoryClass=TaskRepository::class)
+ * @ORM\Entity(repositoryClass="App\Repository\TaskRepository", repositoryClass=TaskRepository::class)
  * @ORM\HasLifecycleCallbacks
  */
 class Task implements JsonSerializable
@@ -41,8 +42,9 @@ class Task implements JsonSerializable
 
     /**
      * @ORM\Column(name="dtmScheduleTime", type="date", nullable=true)
+     * @var \DateTime|null
      */
-    private ?\DateTime $scheduleTime;
+    private $scheduleTime;
 
     /**
      * @ORM\ManyToOne(targetEntity=TaskPriority::class)
@@ -65,13 +67,15 @@ class Task implements JsonSerializable
 
     /**
      * @ORM\Column(type="datetime_immutable")
+     * @var DateTimeImmutable|null
      */
-    private ?\DateTimeImmutable $createdAt;
+    private $createdAt;
 
     /**
      * @ORM\Column(type="datetime_immutable")
+     * @var DateTimeImmutable|null
      */
-    private ?\DateTimeImmutable $updatedAt;
+    private $updatedAt;
 
     public function getId(): ?int
     {
@@ -176,30 +180,30 @@ class Task implements JsonSerializable
      */
     public function updatedTimestamps(): void
     {
-        $this->setUpdatedAt(new \DateTimeImmutable('now'));
+        $this->setUpdatedAt(new DateTimeImmutable('now'));
         if ($this->getCreatedAt() === null) {
-            $this->setCreatedAt(new \DateTimeImmutable('now'));
+            $this->setCreatedAt(new DateTimeImmutable('now'));
         }
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): self
+    public function setCreatedAt(DateTimeImmutable $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): self
+    public function setUpdatedAt(DateTimeImmutable $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 

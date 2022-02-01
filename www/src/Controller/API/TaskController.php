@@ -4,12 +4,10 @@ namespace App\Controller\API;
 
 use App\DataMapper\TaskDataMapper;
 use App\Entity\Task;
-use App\Entity\Task\TaskPriority;
-use App\Entity\Task\TaskStatus;
-use App\Entity\Task\TaskType;
 use App\Repository\TaskRepository;
 use App\Service\TaskService;
-use Doctrine\ORM\EntityManagerInterface;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,8 +15,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use OpenApi\Annotations as OA;
-use Nelmio\ApiDocBundle\Annotation\Model;
 
 /**
  * @Route("/api/task", name="api.task.")
@@ -62,16 +58,19 @@ class TaskController extends AbstractController
      */
     public function addAction(Request $request, ValidatorInterface $validator): Response
     {
+
         try {
             $request = $this->transformJsonBody($request);
             $task = $this->taskDataMapper->mapRequestContentToEntity($request);
             $errors = $validator->validate($task);
+
 
             if (count($errors) > 0) {
                 return $this->formErrorResponse($errors);
             }
 
             $task = $this->taskService->createTask($task);
+
             $data = [
                 'status' => Response::HTTP_OK,
                 'success' => "Post added successfully",
@@ -80,14 +79,12 @@ class TaskController extends AbstractController
 
             return $this->response($data);
         } catch (\Exception $e) {
-
             $data = [
                 'status' => Response::HTTP_UNPROCESSABLE_ENTITY,
                 'errors' => $e->getMessage(),
             ];
             return $this->response($data, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
-
     }
 
     /**
@@ -136,7 +133,6 @@ class TaskController extends AbstractController
 
             return $this->response($data);
         } catch (\Exception $e) {
-
             $data = [
             'status' => Response::HTTP_UNPROCESSABLE_ENTITY,
             'errors' => $e->getMessage(),

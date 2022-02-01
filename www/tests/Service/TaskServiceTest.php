@@ -3,6 +3,9 @@
 namespace App\Tests\Service;
 
 use App\Entity\Task;
+use App\Event\TaskCreatedEvent;
+use App\Event\TaskDeletedEvent;
+use App\Event\TaskUpdatedEvent;
 use App\Service\TaskService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -22,7 +25,7 @@ class TaskServiceTest extends KernelTestCase
     }
 
     /** @test */
-    public function it_has_to_create_task()
+    public function it_has_to_create_task(): void
     {
         // Set Up
         $taskEntity = $this->createMock(Task::class);
@@ -34,6 +37,13 @@ class TaskServiceTest extends KernelTestCase
             ->method('flush');
         $this->eventDispatcherInterface->expects($this->once())
             ->method('dispatch')
+            ->with($this->callback(function($subject) use ($taskEntity)
+            {
+                return is_callable([$subject, 'getTask']) &&
+                    $subject::class == TaskCreatedEvent::class &&
+                    $taskEntity === $subject->getTask()
+                    ;
+            }))
         ;
 
         // Do something
@@ -44,7 +54,7 @@ class TaskServiceTest extends KernelTestCase
     }
 
     /** @test */
-    public function it_has_to_update_task()
+    public function it_has_to_update_task(): void
     {
         // Set Up
         $taskEntity = $this->createMock(Task::class);
@@ -56,10 +66,17 @@ class TaskServiceTest extends KernelTestCase
             ->method('flush');
         $this->eventDispatcherInterface->expects($this->once())
             ->method('dispatch')
+            ->with($this->callback(function($subject) use ($taskEntity)
+            {
+                return is_callable([$subject, 'getTask']) &&
+                    $subject::class == TaskUpdatedEvent::class &&
+                    $taskEntity === $subject->getTask()
+                    ;
+            }))
         ;
 
         // Do something
-        $task = $this->taskService->createTask($taskEntity);
+        $task = $this->taskService->updateTask($taskEntity);
         // Make assertions
 
         $this->assertEquals($task::class, $task::class);
@@ -67,7 +84,7 @@ class TaskServiceTest extends KernelTestCase
 
 
     /** @test */
-    public function it_has_to_delete_task()
+    public function it_has_to_delete_task(): void
     {
         // Set Up
         $taskEntity = $this->createMock(Task::class);
@@ -79,15 +96,19 @@ class TaskServiceTest extends KernelTestCase
             ->method('flush');
         $this->eventDispatcherInterface->expects($this->once())
             ->method('dispatch')
+            ->with($this->callback(function($subject) use ($taskEntity)
+            {
+                return is_callable([$subject, 'getTask']) &&
+                    $subject::class == TaskDeletedEvent::class &&
+                    $taskEntity === $subject->getTask()
+                    ;
+            }))
         ;
 
         // Do something
         $task = $this->taskService->deleteTask($taskEntity);
         // Make assertions
         $this->assertEquals($task::class, $task::class);
-
     }
-
-
 
 }

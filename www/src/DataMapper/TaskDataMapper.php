@@ -16,8 +16,7 @@ class TaskDataMapper
     public function __construct(
         private EntityManagerInterface $entityManager,
     )
-    {
-    }
+    {}
 
     /**
      * @param Request $request

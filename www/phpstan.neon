@@ -4,10 +4,9 @@ includes:
   - vendor/phpstan/phpstan-doctrine/rules.neon
 
 parameters:
+  ignoreErrors:
+    - '#Call to an undefined method [a-zA-Z0-9\\_]+::expects\(\)#'
   level: 6
   parallel:
     maximumNumberOfProcesses: 1
   checkGenericClassInNonGenericObjectType: false
-#  doctrine:
-#    ormRepositoryClass: MyApp\Doctrine\BetterEntityRepository
-#    odmRepositoryClass: MyApp\Doctrine\BetterDocumentRepository
