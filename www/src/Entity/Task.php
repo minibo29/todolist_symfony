@@ -25,45 +25,46 @@ class Task implements JsonSerializable
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * @SerializedName("id")
+     * @var int|null
      */
-    private ?int $id;
+    private ?int $id = null;
 
     /**
      * @ORM\Column(name="strTaskName", type="string", length=50)
      * @Assert\NotBlank
      */
-    private ?String $title;
+    private ?String $title = null;
 
     /**
      * @ORM\Column(name="strTaskDesc", type="text", length=255)
      * @Assert\NotBlank
      */
-    private ?String $desc;
+    private ?String $desc = null;
 
     /**
      * @ORM\Column(name="dtmScheduleTime", type="date", nullable=true)
      * @var \DateTime|null
      */
-    private $scheduleTime;
+    private $scheduleTime = null;
 
     /**
      * @ORM\ManyToOne(targetEntity=TaskPriority::class)
      * @ORM\JoinColumn
      * @Assert\NotBlank
      */
-    private ?TaskPriority $priority;
+    private ?TaskPriority $priority = null;
 
     /**
      * @ORM\ManyToOne(targetEntity=TaskType::class)
      * @Assert\NotBlank
      */
-    private ?TaskType $type;
+    private ?TaskType $type = null;
 
     /**
      * @ORM\ManyToOne(targetEntity=TaskStatus::class)
      * @Assert\NotBlank
      */
-    private ?TaskStatus $status;
+    private ?TaskStatus $status = null;
 
     /**
      * @ORM\Column(type="datetime_immutable")

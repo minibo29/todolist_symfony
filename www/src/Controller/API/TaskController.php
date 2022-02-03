@@ -4,6 +4,7 @@ namespace App\Controller\API;
 
 use App\DataMapper\TaskDataMapper;
 use App\Entity\Task;
+use App\Exceptions\ExceptionsCodes;
 use App\Repository\TaskRepository;
 use App\Service\TaskService;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -190,7 +191,7 @@ class TaskController extends AbstractController
             $errorMessages[$violation->getPropertyPath()][] = $violation->getMessage();
         }
         $data = [
-            'code'=> 1024,
+            'code'=> ExceptionsCodes::ENTITY_VALIDATION_ERROR,
             'message'=> 'Validation Failed',
             'errors' => $errorMessages,
         ];
