@@ -106,6 +106,9 @@
     "laminas/laminas-code": {
         "version": "4.5.1"
     },
+    "liip/test-fixtures-bundle": {
+        "version": "2.2.1"
+    },
     "murtukov/php-code-generator": {
         "version": "v0.1.6"
     },

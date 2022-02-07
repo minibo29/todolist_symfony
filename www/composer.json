@@ -50,6 +50,7 @@
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "*",
+        "liip/test-fixtures-bundle": "^2.0.0",
         "phpstan/phpstan": "^1.4",
         "phpstan/phpstan-doctrine": "^1.2",
         "phpunit/phpunit": "^9.5",

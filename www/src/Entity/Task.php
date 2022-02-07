@@ -219,7 +219,7 @@ class Task implements JsonSerializable
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'description' => $this->desc,
+            'desc' => $this->desc,
             'priority' => $this->priority,
             'status' => $this->status,
             'type' => $this->type,
